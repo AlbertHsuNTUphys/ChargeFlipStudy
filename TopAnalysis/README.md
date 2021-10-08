@@ -9,7 +9,7 @@ cmsenv
 git cms-init
 cd $CMSSW_BASE/src
 git clone https://github.com/AlbertHsuNTUphys/ChargeFlipStudy.git
-cd TopAnalysis/
+cd ChargeFlipStudy/TopAnalysis/
 scram b -j 8
 ```
 
