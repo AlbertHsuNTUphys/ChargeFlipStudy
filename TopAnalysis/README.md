@@ -14,7 +14,7 @@ scram b -j 8
 ```
 
 ## Control Plot
-The main code is src/ChargeFlip_nanoaod.cc. To run it, you need to first change the output directory in test/analysis/ExYukawa/Nano_steerAnalysis.sh.
+The main code is src/ChargeFlip_nanoaod.cc. To run it, you need to first **change the output directory** in test/analysis/ExYukawa/Nano_steerAnalysis.sh.
 Then to test the code,
 ```
 cmsenv
