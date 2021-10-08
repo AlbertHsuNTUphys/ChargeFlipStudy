@@ -7,9 +7,9 @@ fi
 rm -f hadd.sh
 rm -f hadd1.sh
 rm -f hadd2.sh
-foldername="/eos/user/e/efe/DataAnalysis/ntuples_and_plots/"$1
-foldername2="test/analysis/ExYukawa/analysis_2017/Chunks/"
-echo $foldername2
+"""foldername="/eos/user/t/tihsu/DataAnalysis/ntuples_and_plots/"$1
+#foldername2="test/analysis/ExYukawa/analysis_2017_chargeflip_SB_detail/Chunks/"
+#echo $foldername2
 if [ ! -d $foldername ]; then
   mkdir $foldername
 else
@@ -22,9 +22,9 @@ if [ $response = "y" ]; then
   mkdir $foldername
 else
   return
-fi
-find /eos/cms/store/cmst3/group/top/RunIIUL/2017/6bfa3f2e/. -type d -exec basename {} \; > hadd.sh
-find /eos/cms/store/cmst3/group/top/RunIIUL/2017/6bfa3f2e/. -type d -exec basename {} \; > hadd1.sh
+fi"""
+find /eos/cms/store/group/phys_top/efe/ntuples_514d5ded/. -type d -exec basename {} \; > hadd.sh
+find /eos/cms/store/group/phys_top/efe/7ed19ab9_ntuples. -type d -exec basename {} \; > hadd1.sh
 tail -n +2 hadd.sh > hadd_tmp.sh
 mv hadd_tmp.sh hadd.sh
 tail -n +2 hadd1.sh > hadd_tmp.sh

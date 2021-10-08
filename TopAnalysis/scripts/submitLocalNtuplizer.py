@@ -129,7 +129,7 @@ def main():
     parser.add_option('--output',    
                       dest='output',   
                       help='output to store [%default]',      
-                      default='/store/cmst3/group/top/RunIIReReco/',
+                      default='/store/user/tihsu',
                       type='string')
     parser.add_option('--dataset',  
                       dest='dataset', 

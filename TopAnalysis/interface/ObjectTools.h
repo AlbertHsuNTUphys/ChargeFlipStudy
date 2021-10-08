@@ -42,6 +42,45 @@ class Particle : public TLorentzVector {
     double unc_;
 };
 
+class nanoParticle : public TLorentzVector {
+
+  public:
+    nanoParticle(TLorentzVector p4, int charge, int id, int nanoid, int origRef, int gen_idx, Float_t puppi = 1,Float_t unc=0)
+      : TLorentzVector(p4), charge_(charge), id_(id), nanoid_(nanoid), origRef_(origRef), puppi_(puppi), unc_(unc), gen_idx_(gen_idx){}
+
+    nanoParticle( const nanoParticle &p)
+      : TLorentzVector(p.px(),p.py(),p.pz(),p.e()), charge_(p.charge_), id_(p.id_), nanoid_(p.nanoid_), origRef_(p.origRef_), puppi_(p.puppi_), unc_(p.unc_), gen_idx_(p.gen_idx_){}
+
+    Float_t px() const    { return TLorentzVector::Px();  }
+    Float_t py() const    { return TLorentzVector::Py();  }
+    Float_t pz() const    { return TLorentzVector::Pz();  }
+    Float_t e()  const    { return TLorentzVector::E();   }
+    Float_t pt()     { return TLorentzVector::Pt();  }
+    Float_t eta()    { return TLorentzVector::Eta(); }
+    Float_t phi()    { return TLorentzVector::Phi(); }
+    Float_t energy() { return TLorentzVector::E(); }
+    Float_t m()      { return TLorentzVector::M(); }
+    Float_t mass()   { return TLorentzVector::M(); }
+    TLorentzVector p4()       { return TLorentzVector(TLorentzVector::Px(),TLorentzVector::Py(),TLorentzVector::Pz(),TLorentzVector::E()); }
+    TLorentzVector momentum() { return TLorentzVector(TLorentzVector::Px(),TLorentzVector::Py(),TLorentzVector::Pz(),TLorentzVector::E()); }
+    int charge()    { return charge_; }
+    int id()        { return id_; }
+    int nanoid() { return nanoid_; }
+//    bool hasQualityFlag(int bit) { return ((qualityFlags_>>bit)&0x1); }
+    int originalReference() { return origRef_; }
+    void setOriginalReference(int origRef) { origRef_=origRef; }
+    Float_t puppi()  { return puppi_; }
+    Float_t scaleUnc() { return unc_; }
+    int genIdx(){ return gen_idx_; }
+
+  private:
+    int charge_, id_, nanoid_,origRef_;
+    Float_t puppi_;
+    Float_t unc_;
+    int gen_idx_;
+};
+
+
 /**
    @short summarizes the information on a jet needed for the charmed meson analysis
  */

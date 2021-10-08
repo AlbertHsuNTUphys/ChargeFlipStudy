@@ -23,6 +23,9 @@ def main():
     #prepare output directory
     if opt.outDir is None: opt.outDir=opt.inDir
 
+    #eosdir = '/eos/cms'
+    eosdir = 'root://se01.grid.nchc.org.tw//'
+
     cmsswBase=os.environ['CMSSW_BASE']
     FARMDIR='%s/INTEGRITYFARM'%cmsswBase
     if opt.farm: FARMDIR += opt.farm
@@ -102,15 +105,15 @@ def main():
                 out_list=[]
                 count_list=getEOSlslist(directory=time_list[0],prepend='')
 
-                chunkList=getChunksInSizeOf(chunkSize=opt.chunkSize,directoryList=count_list,prepend='/eos/cms/')
+                chunkList=getChunksInSizeOf(chunkSize=opt.chunkSize,directoryList=count_list,prepend=eosdir)
                 print pub,'will be hadded in',len(chunkList),'chunks of approx %fGb'%opt.chunkSize
                 for ichunk in xrange(0,len(chunkList)):
-                    outFile='/eos/cms/{0}/{1}/Chunk_{2}_{3}.root'.format(opt.outDir,pub,ichunk,pubExt)
+                    outFile=eosdir+'/{0}/{1}/Chunk_{2}_{3}.root'.format(opt.outDir,pub,ichunk,pubExt)
                     condor.write('arguments = %s %s\n'%(outFile,' '.join(chunkList[ichunk])))
                     condor.write('queue 1\n')
 
                 #prepare output directory
-                if not opt.dry: os.system('mkdir -p /eos/cms/{0}/{1}'.format(opt.outDir,pub))
+                if not opt.dry: os.system('mkdir -p '+eosdir+'/{0}/{1}'.format(opt.outDir,pub))
 
     else:
         print 'Local production'
@@ -127,14 +130,14 @@ def main():
                     print 'Skipping %s, not in process only list'%pub
                     continue
 
-            chunkList=getChunksInSizeOf(chunkSize=opt.chunkSize,directoryList=[dset],prepend='/eos/cms/')
+            chunkList=getChunksInSizeOf(chunkSize=opt.chunkSize,directoryList=[dset],prepend=eosdir)
             print pub,'will be hadded in',len(chunkList),'chunks of approx %fGb'%opt.chunkSize
             for ichunk in xrange(0,len(chunkList)):
-                outFile='/eos/cms/{0}/{1}/Chunk_{2}_ext0.root'.format(opt.outDir,pub,ichunk)
+                outFile=eosdir+'/{0}/{1}/Chunk_{2}_ext0.root'.format(opt.outDir,pub,ichunk)
                 condor.write('arguments = %s %s\n'%(outFile,' '.join(chunkList[ichunk])))
                 condor.write('queue 1\n')                
 
-            if not opt.dry: os.system('mkdir -p /eos/cms/{0}/{1}'.format(opt.outDir,pub))
+            if not opt.dry: os.system('mkdir -p '+eosdir+'/{0}/{1}'.format(opt.outDir,pub))
 
     condor.close()
     if not opt.dry:

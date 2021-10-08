@@ -24,9 +24,10 @@ fi
 
 #configuration parameters
 queue=tomorrow
-samples=$CMSSW_BASE/src/TopLJets2015/TopAnalysis/test/analysis/ExYukawa/samples_${ERA}.json
+samples=$CMSSW_BASE/src/TopLJets2015/TopAnalysis/test/analysis/ExYukawa/samples_${ERA}_chargeflip.json
 samples_signal=$CMSSW_BASE/src/TopLJets2015/TopAnalysis/test/analysis/ExYukawa/samples_${ERA}_signal.json
-outdir=$CMSSW_BASE/src/TopLJets2015/TopAnalysis/test/analysis/ExYukawa/analysis_${ERA}
+outdir=$CMSSW_BASE/src/TopLJets2015/TopAnalysis/test/analysis/ExYukawa/analysis_${ERA}_chargeflip_genmatching
+
 #outdir=/eos/cms/store/group/phys_top/efe/ExYukawa/analysis_${ERA}
 if [[ ${ERA} = "2016" ]]; then
     githash=0c522df
@@ -39,10 +40,18 @@ if [[ ${ERA} = "2016" ]]; then
 elif [[ ${ERA} = "2017" ]]; then
 ###    githash=848840ab
 ###    githash=ab05162
-    #githash=6bfa3f2e
-    #eosdir=/store/cmst3/group/top/RunIIUL/2017/${githash}
-    githash=a02ce4df
-    eosdir=/store/group/phys_top/efe/ntuples_${githash}_all
+#    githash=6bfa3f2e
+#    eosdir=/store/cmst3/group/top/RunIIUL/2017/${githash}
+#   githash=7ed19ab9
+#   eosdir=/store/group/phys_top/efe/7ed19ab9_ntuples
+#   githash=514d5ded
+#   eosdir=/store/group/phys_top/efe/ntuples_514d5ded
+#    githash=a02ce4df
+#    eosdir=/store/group/phys_top/efe/ntuples_${githash}_all
+    githash=1d869afa
+    eosdir=/store/group/phys_top/efe/1d869afa_ntuples
+#    githash=39fa2880
+#    eosdir=/store/group/phys_top/efe/ntuples_39fa2880
 #    githash=ae6e08e
 #    eosdir=/store/cmst3/group/top/RunIIReReco/2017/${githash}
     dataeosdir=${eosdir}
@@ -53,7 +62,11 @@ elif [[ ${ERA} = "2017" ]]; then
     #testfile=/store/cmst3/group/top/RunIIReReco/2017/ae6e08e/MC13TeV_2017_TTWH/Chunk_0_ext0.root
     #testfile=/store/cmst3/group/top/RunIIUL/2017/848840ab/MC13TeV_2017_TAToTTQ_MA200_G2HDM_rtc04/Chunk_0_ext0.root
     #testfile=/store/cmst3/group/hintt/psilva/6bfa3f2e/TAToTTQ_MA-200_TuneCP5_13TeV_G2HDM-rtc04-madgraphMLM-pythia8/crab_MC13TeV_2017_TAToTTQ_MA200_G2HDM_rtc04/200915_073154/0000/MiniEvents_6.root
-    testfile=/store/cmst3/group/top/RunIIUL/2017/6bfa3f2e/MC13TeV_2017_TAToTTQ_MA200_G2HDM_rtc04/Chunk_0_ext0.root
+#    testfile=${eosdir}/MC13TeV_2017_TTGJets/Chunk_0_ext0.root
+    testfile=${eosdir}/MC13TeV_2017_DY50toInf_mlm/Chunk_0_ext0.root
+#    testfile=${eosdir}/Data13TeV_2017F_SingleMuon/Chunk_0_ext0.root
+#    testfile=/cms/store/user/tihsu/f19058c7/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/crab_MC13TeV_2017_DY50toInf_fxfx/210510_144200/0000/MiniEvents_99.root
+#    testfile=${eosdir}/MC13TeV_2017_TTTo2L2Nu/Chunk_0_ext0.root
     #testfile=/store/cmst3/group/top/RunIIReReco/2017/ae6e08e/MC13TeV_2017_TAToTTQ_MA200_G2HDM_rtc04/Chunk_0_ext0.root
     #testfile=/store/cmst3/group/top/RunIIReReco/2017/ae6e08e/MC13TeV_2017_TTZZ/Chunk_0_ext0.root
 #  elif [[ ${ERA} = "2017_add_bkgs" ]]; then
@@ -85,12 +98,12 @@ case $WHAT in
             -i ${testfile} --tag ${testtag} \
             -o testsel_${ERA}.root --genWeights genweights_${githash}.root \
             --njobs 1 -q local --debug \
-            --era era${ERA} -m RunExYukawa;
+            --era era${ERA} -m RunChargeFlip;
         ;;
 
     SEL )
         baseOpt="--genWeights genweights_${githash}.root"
-        baseOpt="${baseOpt} -o ${outdir} -q ${queue} --era era${ERA} -m RunExYukawa"
+        baseOpt="${baseOpt} -o ${outdir} -q ${queue} --era era${ERA} -m RunChargeFlip"
         baseOpt="${baseOpt} --only ${samples}";
   #echo ${samples};
   #return;

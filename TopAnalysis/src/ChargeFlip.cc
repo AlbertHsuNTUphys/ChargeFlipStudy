@@ -27,6 +27,10 @@ float deltaEta(float eta1, float eta2);
 bool ispassCtag(int WP, Float_t CvsL, Float_t CvsB);
 bool ispassCtag_DeepJet(int WP, Float_t CvsL, Float_t CvsB);
 bool ispassBtag(int WP, bool btag_loose, bool btag_medium,bool btag_tight);
+bool in_kinRegion(int i, int j, int ii, int jj, Particle p1, Particle p2, std::vector<float> pt_region, std::vector<float> eta_region);
+bool in_kinRegion(int i, int j, Particle p1, std::vector<float> pt_region, std::vector<float> eta_region);
+bool in_genkinRegion(int i, int j, Particle p1, std::vector<float> pt_region, std::vector<float> eta_region, MiniEvent_t ev);
+float gendeltaR(Particle p1, MiniEvent_t ev);
 //
 void RunChargeFlip(const TString in_fname,
                       TString outname,
@@ -53,12 +57,30 @@ void RunChargeFlip(const TString in_fname,
   //WP for ctagging
   float ctag_WP = 2; //1:Loose, 2:Medium, 3:Tight 
   //Charge Flip region definition
-  int pt_bins = 4;
-  int eta_bins = 3;
-  float pt_region[pt_bins+1] = {20., 50., 100.,200., 10000000000.};
-  float eta_region[eta_bins+1] = {0., 0.8, 1.479, 2.5}; // 1.479 is the boundary of ECAL and endcap
-  float Mean[4] = {89.06, 89.96, 90.18, 90.59};
-  float width[4] = {26.9,23.3,21.8,20.3};
+  std::vector<float> pt_region = {20., 50., 100., 10000000000.};
+  std::vector<float> eta_region = {0., 0.8, 1.479, 2.4}; 
+  int pt_bins = pt_region.size()-1;
+  int eta_bins = eta_region.size()-1;
+  float Mean[4] = {89.15573832247031, 89.15573832247031, 90.20149814108521, 90.20149814108521};
+  float width[4] = {17.829799999971787, 17.829799999971787, 15.00849999997836, 15.00849999997836};
+  float MC_CF_rate[pt_bins][eta_bins] = {{4.192558506539435e-05, 0.000161793633723778, 0.0011706195189897296}, {5.3691838793823446e-05, 0.00017567738172425407, 0.0015148151127558742}, {0.0002552579230190144, 0.0006527277367098683, 0.002469910506971934}};
+  float SF_CF_rate[pt_bins][eta_bins] = {{1.326258580123612, 1.424997915357615, 1.4029427475580072}, {1.0874808175046184, 1.6769869998724587, 1.2416054142468111}, {1.223575205904125, 1.3465202310577777, 1.6949749872484594}};
+
+//  float MC_CF_rate[pt_bins][eta_bins] = {{4.150600796886672e-05, 0.00016333952243531848, 0.001145738587205375}, {4.678340511570234e-05, 0.00016792697669102964, 0.0015109063830754223}, {0.0003134716956329387, 0.0003757317368941915, 0.0016507036735403603}};
+//  float SF_CF_rate[pt_bins][eta_bins] = {{1.3723709445424477, 1.3793168845258146, 1.4147759759034455}, {0.936878611592791, 1.7369301518708173, 1.207508675581035},{1.0028249446945015, 1.7427504313863447, 2.1601362942684847}};
+
+//  float SF_CF_rate[pt_bins][eta_bins] = {{1.4287770018703307, 1.378604854042069, 1.4207905588812744}, {0.8462622740646734, 1.7017937653843902, 1.1437509562262347}, {0.8550660774661205, 1.713766070953878, 2.1610147826154913}};
+
+
+//  float SF_CF_rate[pt_bins][eta_bins]  ={{1.468963468323734, 1.401536482842170}, {1.1945242865686856, 1.23141454675663}, {4.791493189062834, 1.509664879493467}};
+
+//  float SF_CF_rate[pt_bins][eta_bins] = {1.4660111384450834, 1.4014775672443347}, {1.2140915744226843, 1.2332852357591746}, {6.423060751452844, 1.47931150477616}, {0.33021010997207934, 1.9932808944908136}};
+
+//  float SF_CF_rate[pt_bins][eta_bins] = {{1.2948499790846633, 1.472296945252723, 1.401098547961572}, {1.0795087283951716, 1.6609081598695847, 1.2308894435523705}, {1.2996096306493043, 1.1475319039404224, 1.5752720114108036}};
+
+//  float SF_CF_rate[pt_bins][eta_bins] = {{1.344477117177974, 1.420806117894896, 1.4129019861741061}, {0.8731999915014677, 1.7102193256930505, 1.1815592004621993}, {1.0884860170343404, 1.636726448481711, 1.9103717105492761}};
+
+//  float SF_CF_rate[pt_bins][eta_bins] = {{1.9770050566252089, 1.4174039246057801, 1.3803488460606244}, {1.335983460712754, 2.4909239745446436, 1.3489817632276546}, {0.9121473677819845, 2.55381293079621, 4.078467652727143}};
 
 
   //CORRECTIONS: LUMINOSITY+PILEUP
@@ -109,6 +131,7 @@ void RunChargeFlip(const TString in_fname,
   ht.addHist("control_m_ll_bc",		new TH1F("control_m_ll_bc",   ";M(l+,l-) [GeV] ; Events", 20,12,600));
   ht.addHist("control_pT_ll_bc",  new TH1F("control_pT_ll_bc",  ";p_{T}(l+,l-) [GeV] ; Events", 80,0,200));
   ht.addHist("control_y_ll_bc",  new TH1F("control_y_ll_bc",  ";y(l+,l-) [GeV] ; Events", 20,-5,5));
+  ht.addHist("control_njets", new TH1F("control_njets","; njets ; Events",4,0,4));
 
   ht.addHist("control_ss_Z_mass",    new TH1F("control_ss_Z_mass",    ";M(Z) [GeV];Events",40,70,110));
   ht.addHist("control_ss_lep_pt_bc", new TH1F("control_ss_lep_pt_bc", ";p_{T}(l) [GeV]; Events", 30,0,600));
@@ -259,7 +282,7 @@ void RunChargeFlip(const TString in_fname,
           ht.addHist(s1+"_oc_Zmass", new TH1F(s1+"_oc_Zmass"," ; M(l,l)[GeV] ; Events", 80,50,130));
           ht.addHist(s1+"_ss_Zmass", new TH1F(s1+"_ss_Zmass"," ; M(l,l)[GeV] ; Events", 80,50,130));
        }}}}
-//  TH1F *a_test1 = new TH1F("a_test1","a_test1",30,0,60);//for debugging
+///  TH1F *a_test1 = new TH1F("a_test1","a_test1",30,0,60);//for debugging
 
 //  ht.addHist("b_matched_jet",  new TH1F("b_matched_jet", ";p_T(b matched jet) [GeV]; Events", 24,0,600));
 //  ht.addHist("c_matched_jet",  new TH1F("c_matched_jet", ";p_T(c matched jet) [GeV]; Events", 24,0,600));
@@ -303,6 +326,20 @@ void RunChargeFlip(const TString in_fname,
   float t_Zmass;
   bool t_isSS;
   float t_Nss[pt_bins][eta_bins][pt_bins][eta_bins], t_Noc[pt_bins][eta_bins][pt_bins][eta_bins];
+  float t_g_Nss[pt_bins][eta_bins], t_g_Noc[pt_bins][eta_bins];
+  float t_gm_Nss[pt_bins][eta_bins], t_gm_Noc[pt_bins][eta_bins];
+
+  int Flag_HBHENoiseFilter; 
+  int Flag_HBHENoiseIsoFilter;
+  int Flag_EcalDeadCellTriggerPrimitiveFilter;
+  int Flag_goodVertices;
+//  int Flag_eeBadScFilter;
+  int Flag_globalSuperTightHalo2016Filter;
+  //int Flag_BadChargedCandidateFilter;//Not recommended yet.
+  //ecalBadCalibReducedMINIAODFilter --> recommended but not ready yet.
+   //For this miniaod needs to be re-run but the recipe is note ready yet.
+  int Flag_BadPFMuonFilter;
+  int N_selections;
 
   t_input.Branch("event",&ev.event,"event/I");
   t_input.Branch("run",&ev.run,"run/i");
@@ -411,6 +448,13 @@ void RunChargeFlip(const TString in_fname,
          t_Nss[i][j][ii][jj] = 0.;
          t_Noc[i][j][ii][jj] = 0.;
    }}}}
+  for(int i = 0; i < pt_bins; i++){
+    for(int j = 0; j < eta_bins; j++){
+      t_g_Nss[i][j] = 0.;
+      t_gm_Nss[i][j] = 0.;
+      t_g_Noc[i][j] = 0.;
+      t_gm_Noc[i][j] = 0.;
+  }}
   /*
   int Ntotal_lepton = 0;
   int Ntotal_after_samesign = 0;
@@ -498,8 +542,14 @@ void RunChargeFlip(const TString in_fname,
 //      cout << "Trigger = "<<hasMTrigger << endl;
 //      if(ev.isData && !hasMTrigger) continue;
 
-
-
+     Flag_HBHENoiseFilter=(ev.met_filterBits)&0x1;
+     Flag_HBHENoiseIsoFilter=(ev.met_filterBits>>1)&0x1;
+     Flag_EcalDeadCellTriggerPrimitiveFilter=(ev.met_filterBits>>2)&0x1;
+     Flag_goodVertices=(ev.met_filterBits>>3)&0x1;
+//     Flag_eeBadScFilter=(ev.met_filterBits>>4)&0x1;//Not suggested!
+     Flag_globalSuperTightHalo2016Filter=(ev.met_filterBits>>5)&0x1;
+     Flag_BadPFMuonFilter=(ev.met_filterBits>>6)&0x1;
+     if (!(Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_BadPFMuonFilter)) continue;
 
 
       ht.fill("h_scan_mass_bc",ev.scan_mass,1);
@@ -625,6 +675,7 @@ void RunChargeFlip(const TString in_fname,
         float electronSF = 1.;
         float emuSF = 1.;
         float dilepton_trig_SF = 1.;
+        float chargeflip_SF = 1.;
         if (dimuon_event == 1){
           EffCorrection_t muon1SF = lepEffH.getMuonSF(leptons[0].pt(),leptons[0].eta());
           EffCorrection_t muon2SF = lepEffH.getMuonSF(leptons[1].pt(),leptons[1].eta());
@@ -665,8 +716,26 @@ void RunChargeFlip(const TString in_fname,
         evWgt  = normWgt*puWgt*l1prefireProb.first*leptonSF*dilepton_trig_SF;
         t_normWgt = normWgt;
         evWgt *= (ev.g_nw>0 ? ev.g_w[0] : 1.0);//generator weights
+/*        for(int i = 0; i<pt_bins; i++){
+          for(int j = 0; j<eta_bins; j++){
+            for(int ii = 0; ii<pt_bins; ii++){
+              for(int jj = 0; jj<eta_bins; jj++){
+                if(in_kinRegion(i,j,ii,jj,leptons[0],leptons[1],pt_region,eta_region)){
+                  float s1 = SF_CF_rate[i][j];
+                  float s2 = SF_CF_rate[ii][jj];
+                  float p1 = MC_CF_rate[i][j];
+                  float p2 = MC_CF_rate[ii][jj];
+                  if (leptons[0].charge()*leptons[1].charge() >0) chargeflip_SF = (s1*p1+s2*p2-2.*s1*s2*p1*p2)/(p1+p2-2.*p1*p2);
+                  if (leptons[0].charge()*leptons[1].charge() <0) chargeflip_SF = (1.-s1*p1-2.*s2*p2+s1*s2*p1*p2)/(1.-p1-p2+2.*p1*p2);
+                }
+              }
+            }
+          }
+        }
+        evWgt *= chargeflip_SF;*/
       }
-      ht.fill("n_after_selection", 1,evWgt, tags2);
+      N_selections = 1;
+      ht.fill("n_after_selection", N_selections,evWgt, tags2);
       if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",1,evWgt, tags2);
       ht.fill("test_mll",(leptons[0]+leptons[1]).M(),evWgt, tags2);
       Ntotal_lepnum+=evWgt;
@@ -677,7 +746,7 @@ void RunChargeFlip(const TString in_fname,
 
   //    if (leptons[0].pt() < 30.) continue;
       Ntotal_lep1_pt+=evWgt;
-      ht.fill("n_after_selection", 2,evWgt, tags2);
+//      ht.fill("n_after_selection", 2,evWgt, tags2);
       if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",2,evWgt, tags2);
       if (leptons[0].charge()*leptons[1].charge()<0){
         ht.fill("control_n_after_selection", 2, evWgt, tags2);
@@ -688,28 +757,43 @@ void RunChargeFlip(const TString in_fname,
       if (leptons[1].pt() < 20.) continue;
       if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",3,evWgt, tags2);
       Ntotal_lep2_pt+=evWgt;
-      ht.fill("n_after_selection", 3,evWgt, tags2);
+//      ht.fill("n_after_selection", 3,evWgt, tags2);
       if (leptons[0].charge()*leptons[1].charge()<0){
          ht.fill("control_n_after_selection", 3, evWgt, tags2);
          control_n_lep2+=evWgt;
       }
 
 
-      if (leptons.size() > 2 && leptons[2].pt() > 20.) continue;
+//      if (leptons.size() > 2 && leptons[2].pt() > 20.) continue;
+      if(!(ev.l_isGsfCtfScPixChargeConsistent[leptons[0].originalReference()] && ev.l_isGsfCtfScPixChargeConsistent[leptons[1].originalReference()])) continue;
       Ntotal_lep3_pt+=evWgt;
-      ht.fill("n_after_selection", 4,evWgt, tags2);
+      N_selections++;
+      ht.fill("n_after_selection", N_selections,evWgt, tags2);
       if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",4,evWgt, tags2);
       if (leptons[0].charge()*leptons[1].charge()<0){
          ht.fill("control_n_after_selection", 4, evWgt, tags2);
          control_n_lep3+=evWgt;
       }
       //if (evWgt < 0.) continue;
+      if(ev.met_pt > 50.) continue;
+      N_selections++;
+      ht.fill("n_after_selection", N_selections,evWgt, tags2);
+
+      bool passbtagging = 0;
+      for(size_t ij=0; ij<allJets.size(); ij++){
+        int idx=allJets[ij].getJetIndex();
+        if(ev.j_btag[idx]>0) passbtagging = 1; 
+      }
+      if(passbtagging) continue;
+      N_selections++;
+      ht.fill("n_after_selection", N_selections,evWgt, tags2);
+
 
       float invariant_mass = (leptons[0]+leptons[1]).M();
       ht.fill("control_m_ll_bc",  invariant_mass,        evWgt, tags2);
 
       float zmass = (leptons[0]+leptons[1]).M();
-      if (leptons[0].charge()*leptons[1].charge() < 0){
+/*      if (leptons[0].charge()*leptons[1].charge() < 0 && jets.size()<3 ){
         ht.fill("control_Z_mass", zmass,        evWgt, tags2);
         if (zmass > 70. && zmass < 110.){
           ht.fill("control_2_lep_pt_bc", leptons[0].pt(),evWgt, tags2);
@@ -724,7 +808,7 @@ void RunChargeFlip(const TString in_fname,
           ht.fill("control_Y_ll_bc",(leptons[0]+leptons[1]).Eta(),evWgt, tags2);
         }
       }
-
+*/
 /*      int num_btags = 0;
       for(size_t ij=0; ij<allJets.size(); ij++){
           int idx=allJets[ij].getJetIndex();
@@ -799,10 +883,43 @@ void RunChargeFlip(const TString in_fname,
     }
   }
 
+
+  if(!ev.isData && (jets.size() < 3)){   
+    if(((leptons[0].charge()*leptons[1].charge() >0 && fabs(zmass-Mean[1])<width[1]) || (leptons[0].charge()*leptons[1].charge() <0 && fabs(zmass-Mean[3])<width[3]))){
+      for (size_t in_nlep=0; in_nlep<leptons.size();in_nlep++){
+        int l_index = leptons[in_nlep].originalReference();
+        if(in_nlep>1) continue;
+        int g_index = ev.l_g[l_index];
+        if (g_index < 0) continue;
+        if (gendeltaR(leptons[in_nlep],ev)>0.4) continue;
+        if ((fabs(ev.g_id[g_index]) == 11)){
+          for(int i = 0; i < pt_bins; i++){
+            for(int j = 0; j < eta_bins; j++){
+              if(in_genkinRegion(i,j,leptons[in_nlep],pt_region,eta_region,ev)){
+                if(leptons[in_nlep].charge()*ev.g_charge[g_index]<0) t_g_Nss[i][j]+=evWgt;
+                else if(leptons[in_nlep].charge()*ev.g_charge[g_index]>0) t_g_Noc[i][j]+=evWgt;    
+              }
+            }
+          }
+        }
+        else if ((fabs(ev.g_id[g_index]) == 13)){
+          for(int i = 0; i < pt_bins; i++){
+            for(int j = 0; j < eta_bins; j++){
+              if(in_genkinRegion(i,j,leptons[in_nlep],pt_region,eta_region,ev)){
+                if(leptons[in_nlep].charge()*ev.g_charge[g_index]<0) t_gm_Nss[i][j]+=evWgt;
+                else if(leptons[in_nlep].charge()*ev.g_charge[g_index]>0) t_gm_Noc[i][j]+=evWgt;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   if(jets.size() < 3){
     if (leptons[0].charge()*leptons[1].charge() >0) ht.fill("ss_Zmass",zmass,evWgt, tags2);
     if (leptons[0].charge()*leptons[1].charge() <0) ht.fill("oc_Zmass",zmass,evWgt, tags2);
-    if (dielectron_event){
+    if (dimuon_event){
       for(int i = 0; i<pt_bins; i++){
         for(int j = 0; j<eta_bins; j++){
           for(int ii = 0; ii<pt_bins; ii++){
@@ -811,11 +928,11 @@ void RunChargeFlip(const TString in_fname,
                 if (leptons[0].charge()*leptons[1].charge() >0){
                   if (ev.isData){
                     if(fabs(zmass-Mean[0])<width[0]) t_Nss[i][j][ii][jj]+=evWgt;
-                    else if(fabs(zmass-Mean[0])<2*width[0]) t_Nss[i][j][ii][jj]-=evWgt;
+                    //else if(fabs(zmass-Mean[0])<2*width[0]) t_Nss[i][j][ii][jj]-=evWgt;
                   }
                   else{
                     if(fabs(zmass-Mean[1])<width[1]) t_Nss[i][j][ii][jj]+=evWgt;
-                    else if(fabs(zmass-Mean[1])<2*width[1]) t_Nss[i][j][ii][jj]-=evWgt;
+                   // else if(fabs(zmass-Mean[1])<2*width[1]) t_Nss[i][j][ii][jj]-=evWgt;
                   }
                   TString s2 = TString("CF"+to_string(i)+to_string(j)+to_string(ii)+to_string(jj));
                   ht.fill(s2+"_ss_Zmass",zmass,evWgt,tags2);
@@ -823,11 +940,11 @@ void RunChargeFlip(const TString in_fname,
                 if (leptons[0].charge()*leptons[1].charge() <0){
                   if (ev.isData){
                     if(fabs(zmass-Mean[2])<width[2]) t_Noc[i][j][ii][jj]+=evWgt;
-                    else if(fabs(zmass-Mean[2])<2*width[2]) t_Noc[i][j][ii][jj]-=evWgt;
+                //    else if(fabs(zmass-Mean[2])<2*width[2]) t_Noc[i][j][ii][jj]-=evWgt;
                   }
                   else{
                     if(fabs(zmass-Mean[3])<width[3]) t_Noc[i][j][ii][jj]+=evWgt;
-                    else if(fabs(zmass-Mean[3])<2*width[3]) t_Noc[i][j][ii][jj]-=evWgt;
+                  //  else if(fabs(zmass-Mean[3])<2*width[3]) t_Noc[i][j][ii][jj]-=evWgt;
                   }
                   TString s3 = TString("CF"+std::to_string(i)+std::to_string(j)+std::to_string(ii)+std::to_string(jj));
                   ht.fill(s3+"_oc_Zmass",zmass,evWgt,tags2);
@@ -838,7 +955,7 @@ void RunChargeFlip(const TString in_fname,
         }
      }
     }
-    else{
+/*    else{
       for(int i = 0; i<pt_bins; i++){
         for(int j = 0; j<eta_bins; j++){
           for(int ii = 0; ii<pt_bins; ii++){
@@ -850,7 +967,7 @@ void RunChargeFlip(const TString in_fname,
             }
          }
      }
-
+*/
       t_Zmass = zmass;
       t_isSS = (leptons[0].charge()*leptons[1].charge()>0);
       t_pt_l1=leptons[0].pt();
@@ -866,12 +983,39 @@ void RunChargeFlip(const TString in_fname,
   ht.fill("test_mll_beforestrict",(leptons[0]+leptons[1]).M(),evWgt, tags2);
 //  if(!(ev.l_isGsfCtfScPixChargeConsistent[leptons[0].originalReference()] and ev.l_isGsfCtfScPixChargeConsistent[leptons[1].originalReference()])) continue;
   ht.fill("test_mll_afterstrict",(leptons[0]+leptons[1]).M(),evWgt, tags2);
-  ht.fill("n_after_selection", 5,evWgt, tags2);
+//  ht.fill("n_after_selection", 5,evWgt, tags2);
+
+    if (leptons[0].charge()*leptons[1].charge() < 0 && jets.size()<3 ){
+      ht.fill("control_Z_mass", zmass,        evWgt, tags2);
+      if (zmass > 70. && zmass < 110.){
+        ht.fill("control_2_lep_pt_bc", leptons[0].pt(),evWgt, tags2); 
+        ht.fill("control_2_lep_pt_bc", leptons[1].pt(),evWgt, tags2);
+        ht.fill("control_2_lep_eta_bc", leptons[0].eta(),evWgt, tags2);
+        ht.fill("control_2_lep_eta_bc", leptons[1].eta(),evWgt, tags2);
+        for (size_t in_nlep=0; in_nlep<leptons.size();in_nlep++){
+          ht.fill("control_lep_pt_bc", leptons[in_nlep].pt(), evWgt, tags2);
+          ht.fill("control_lep_eta_bc",leptons[in_nlep].eta(), evWgt, tags2);
+        }
+        ht.fill("control_pT_ll_bc",(leptons[0]+leptons[1]).Pt(),evWgt, tags2);
+        ht.fill("control_Y_ll_bc",(leptons[0]+leptons[1]).Eta(),evWgt, tags2);
+        ht.fill("control_njets",jets.size(),evWgt,tags2);
+      }
+
+    }
+
+
+
+  if (jets.size() > 2) continue;
+  N_selections++;
+  ht.fill("n_after_selection", N_selections,evWgt, tags2);
+
 
   if (leptons[0].charge()*leptons[1].charge() < 0) continue;
   ht.fill("test_mll_afterss",(leptons[0]+leptons[1]).M(),evWgt, tags2);
   Ntotal_samesign+=evWgt;
-  ht.fill("n_after_selection", 6,evWgt, tags2);
+  N_selections++;
+  ht.fill("n_after_selection", N_selections,evWgt, tags2);
+
   if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",5,evWgt, tags2);
 
 /////////////////////
@@ -904,9 +1048,9 @@ void RunChargeFlip(const TString in_fname,
 
  // if(ev.met_pt < 30.) continue;
 
-  if (jets.size() < 3) continue;
+//  if (jets.size() < 3) continue;
   Ntotal_njet+=evWgt;
-  ht.fill("n_after_selection", 7,evWgt, tags2);
+//  ht.fill("n_after_selection", 7,evWgt, tags2);
   if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",6,evWgt, tags2);
 
 //////////////////////////
@@ -1063,7 +1207,9 @@ void RunChargeFlip(const TString in_fname,
 
   if (num_btags<minNum_btags) continue;
   Ntotal_b+=evWgt;
-  ht.fill("n_after_selection", 8,evWgt, tags2);
+  N_selections++;
+  ht.fill("n_after_selection", N_selections,evWgt, tags2);
+
   if((leptons[0]+leptons[1]).M()<12.) ht.fill("n_after_selection_mll",7,evWgt, tags2);
   if (!(num_ctags<minNum_ctags)){
     ht.fill("compare_tagging_result",2,evWgt,tags2);
@@ -1072,7 +1218,8 @@ void RunChargeFlip(const TString in_fname,
 
   if (!pass_2b1ctag) continue;
   Ntotal_c+=evWgt;
-  ht.fill("n_after_selection", 9,evWgt, tags2);
+  N_selections++;
+  ht.fill("n_after_selection", N_selections,evWgt, tags2);
   ht.fill("test_mll_afterall",(leptons[0]+leptons[1]).M(),evWgt, tags2); 
   ht.fill("compare_tagging_result",3,evWgt,tags2);
 
@@ -1331,6 +1478,15 @@ t_weight=evWgt;
   TBranch* b13 = t_input.Branch("control_n_lep3", &control_n_lep3, "control_n_lep3/F");
   TBranch* b14 = t_input.Branch("t_Nss", t_Nss, s4);
   TBranch* b15 = t_input.Branch("t_Noc", t_Noc, s5);
+  TString s6 = TString("t_g_Nss["+std::to_string(pt_bins)+"]["+std::to_string(eta_bins)+"]/F");
+  TString s7 = TString("t_g_Noc["+std::to_string(pt_bins)+"]["+std::to_string(eta_bins)+"]/F");
+  TBranch* b16 = t_input.Branch("t_g_Nss", t_g_Nss, s6);
+  TBranch* b17 = t_input.Branch("t_g_Noc", t_g_Noc, s7);
+  TString s8 = TString("t_gm_Nss["+std::to_string(pt_bins)+"]["+std::to_string(eta_bins)+"]/F");
+  TString s9 = TString("t_gm_Noc["+std::to_string(pt_bins)+"]["+std::to_string(eta_bins)+"]/F");
+  TBranch* b18 = t_input.Branch("t_gm_Nss", t_gm_Nss, s6);
+  TBranch* b19 = t_input.Branch("t_gm_Noc", t_gm_Noc, s7);
+
 
   b10->Fill();
   b11->Fill();
@@ -1338,6 +1494,11 @@ t_weight=evWgt;
   b13->Fill();
   b14->Fill();
   b15->Fill();
+  b16->Fill();
+  b17->Fill();
+  b18->Fill();
+  b19->Fill();
+  
   t_input.Write();
 
 
@@ -1383,4 +1544,41 @@ bool ispassBtag(int WP, bool btag_loose, bool btag_medium,bool btag_tight)
   if(WP==3) return btag_tight;
   return 0;
 }
+bool in_kinRegion(int i, int j, int ii, int jj, Particle p1, Particle p2, std::vector<float> pt_region, std::vector<float> eta_region)
+{
+   bool pass = true;
+   if(!(pt_region[i] <= p1.pt() && p1.pt() < pt_region[i+1])) pass = false;
+   else if(!(eta_region[j] <= fabs(p1.eta()) && fabs(p1.eta())<eta_region[j+1])) pass = false;
+   else if(!(pt_region[ii] <= p2.pt() && p2.pt() < pt_region[ii+1])) pass = false;
+   else if(!(eta_region[jj] <= fabs(p2.eta()) && fabs(p2.eta()) < eta_region[jj+1])) pass = false;
+   return pass;
+}
+bool in_kinRegion(int i, int j, Particle p1, std::vector<float> pt_region, std::vector<float> eta_region)
+{
+   bool pass = true;
+   if(!(pt_region[i] <= p1.pt() && p1.pt() < pt_region[i+1])) pass = false;
+   else if(!(eta_region[j] <= fabs(p1.eta()) && fabs(p1.eta())<eta_region[j+1])) pass = false;
+   return pass;
+}
+bool in_genkinRegion(int i, int j, Particle p1, std::vector<float> pt_region, std::vector<float> eta_region, MiniEvent_t ev)
+{
+  bool pass = true;
+  int l_index = p1.originalReference();
+  int g_index = ev.l_g[l_index];
+  float pt = ev.g_pt[g_index];
+  float eta = ev.g_eta[g_index];
+  if(!(pt_region[i] <= pt && pt < pt_region[i+1])) pass = false;
+  else if(!(eta_region[j] <= fabs(eta) && fabs(eta)<eta_region[j+1])) pass = false;
+  return pass;
+}
 
+float gendeltaR(Particle p1, MiniEvent_t ev)
+{
+  float dR = 1.0;
+  int l_index = p1.originalReference();
+  int g_index = ev.l_g[l_index];
+  float deta = p1.eta()-ev.g_eta[g_index];
+  float dphi = p1.phi()-ev.g_phi[g_index];
+  dR = std::sqrt(deta*deta+dphi*dphi);
+  return dR;
+}

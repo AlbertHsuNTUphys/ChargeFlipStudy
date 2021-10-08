@@ -6,6 +6,9 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TString.h"
+#include "TopLJets2015/TopAnalysis/interface/EfficiencyScaleFactorsWrapper.h"
+#include "TopLJets2015/TopAnalysis/interface/CtagScaleFactorsWrapper.h"
+
 
 #include <map>
 #include <vector>
@@ -27,6 +30,13 @@ class HistTool {
 
   void fill2D(TString title, double valueX, double valueY, double weight,TString cat="") { fill2D(title, valueX, valueY,std::vector<double>(1,weight),cat); }
   void fill2D(TString title, double valueX, double valueY, double weight,std::vector<TString> cats) { fill2D(title, valueX, valueY,std::vector<double>(1,weight),cats); }
+  void scale(TString title, double value, TString cats);
+  void scale(TString title, double value,std::vector<TString> cats);
+  float integral(TString title, TString cat);
+
+  void start_new_event();
+  void apply_norm_weight();
+  void load_SF(double SF);
 
   std::map<TString, TH1 *> &getPlots()   { return allPlots_; }
   std::map<TString, TH2 *> &get2dPlots() { return all2dPlots_; }
@@ -35,7 +45,9 @@ class HistTool {
   unsigned int nsyst_;
   std::map<TString, TH1 *> allPlots_;
   std::map<TString, TH2 *> all2dPlots_;
-
+  std::map<TString, TH1 *> allPlots_woselSF_;
+  std::map<TString, TH2 *> all2dPlots_woselSF_;
+  float SF_need_to_norm;
 };
 
 #endif

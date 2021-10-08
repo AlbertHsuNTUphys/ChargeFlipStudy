@@ -62,7 +62,7 @@ class Plot(object):
         self.data = None
         self._garbageList = []
         self.plotformats = ['pdf','png']
-        self.savelog = False
+        self.savelog = True
         self.doChi2 = False
         self.range=None
         self.ratiorange = [0.4,1.6]
@@ -260,7 +260,8 @@ class Plot(object):
         if self.dataH is not None:
             if self.data is None: self.finalize()
             if self.data is not None:
-                leg.AddEntry( self.data, self.data.GetTitle(),'ep')
+                data_number = round(self.dataH.Integral(),1)
+                leg.AddEntry( self.data, self.data.GetTitle()+" ["+str(data_number)+"]",'ep')
                 nlegCols += 1
 
         for h in self.mc:
@@ -274,7 +275,8 @@ class Plot(object):
                     self.mc[h].SetTitle('#splitline{%s}{#chi^{2}=%3.1f (p-val: %3.3f)}'%(self.mc[h].GetTitle(),chi2,pval))
                 else:
                     refH.SetLineWidth(2)
-            leg.AddEntry(self.mc[h], self.mc[h].GetTitle(), 'f')
+            mc_yield = round(self.mc[h].Integral(),1)
+            leg.AddEntry(self.mc[h], self.mc[h].GetTitle()+" ["+str(mc_yield)+"]", 'f')
             nlegCols += 1
 
         for m in self.spimpose:

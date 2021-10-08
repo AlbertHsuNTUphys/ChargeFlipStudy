@@ -28,7 +28,7 @@ def main():
     parser.add_option(      '--noStack',     dest='noStack',     help='don\'t stack distributions',     default=False,             action='store_true')
     parser.add_option(      '--normToData',  dest='normToData',  help='normalize to data yields',       default=False,             action='store_true')
     parser.add_option(      '--binWid',      dest='binWid',      help='divide by bin width',            default=False,             action='store_true')
-    parser.add_option(      '--saveLog',     dest='saveLog' ,    help='save log versions of the plots', default=False,             action='store_true')
+    parser.add_option(      '--saveLog',     dest='saveLog' ,    help='save log versions of the plots', default=True,             action='store_true')
     parser.add_option(      '--silent',      dest='silent' ,     help='only dump to ROOT file',         default=False,             action='store_true')
     parser.add_option(      '--ratioRange',  dest='ratioRange' , help='ratio range',                    default="0.4,1.6",         type='string')
     parser.add_option(      '--onlyData',    dest='onlyData' ,   help='only plots containing data',     default=False,             action='store_true')

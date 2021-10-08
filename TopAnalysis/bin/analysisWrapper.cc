@@ -3,9 +3,9 @@
 #include "TopLJets2015/TopAnalysis/interface/CommonTools.h"
 #include "TopLJets2015/TopAnalysis/interface/SMP-19-005.h"
 #include "TopLJets2015/TopAnalysis/interface/PhotonAnalyzers.h"
-//#include "TopLJets2015/TopAnalysis/interface/TopSummer2019.h"
 #include "TopLJets2015/TopAnalysis/interface/ExYukawa.h"
 #include "TopLJets2015/TopAnalysis/interface/ChargeFlip.h"
+#include "TopLJets2015/TopAnalysis/interface/ChargeFlip_nanoaod.h"
 
 #include "TH1F.h"
 #include "TFile.h"
@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
 {
   //get input arguments
   TString in(""),out(""),era(""),normTag(""),method(""),genWeights("genweights.root");
+
   std::string systVar("");
   bool runSysts(false);
   bool debug(false), skimtree(false);
@@ -100,6 +101,9 @@ int main(int argc, char* argv[])
   }
   else if(method=="RunChargeFlip"){
     RunChargeFlip(in,out,normH,puH,era,debug);
+  }
+  else if(method=="RunChargeFlip_nanoaod"){
+    RunChargeFlip_nanoaod(in,out,normH, era,debug);
   }
   else if(method=="PhotonTrigEff::RunPhotonTrigEff") {
     RunPhotonTrigEff(in,out,normH,puH,era,debug);

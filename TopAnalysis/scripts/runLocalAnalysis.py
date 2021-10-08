@@ -142,7 +142,7 @@ def main():
     processedTags=[]
     if '.root' in opt.input:
         inF=opt.input
-        if '/store/' in inF and not 'root:' in inF : inF='root://eoscms//eos/cms'+opt.input              
+#        if '/store/' in inF and not 'root:' in inF : inF='root://eoscms//eos/cms'+opt.input              
         for systVar in varList:
             outF=opt.output
             xsec=1.

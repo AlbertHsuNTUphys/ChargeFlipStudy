@@ -80,9 +80,9 @@ def submitProduction(tag,lfnDirBase,dataset,isData,cfg,workDir,lumiMask,era='era
     config_file.write('config.Data.outLFNDirBase = \"%s\"\n' % lfnDirBase)
     config_file.write('\n')
     config_file.write('config.section_("Site")\n')
-    config_file.write('config.Site.storageSite = "T2_CH_CERN"\n')
+    config_file.write('config.Site.storageSite = "T2_TW_NCHC"\n')
     if addParents:
-        config_file.write('config.Site.whitelist = [\'T2_CH_CERN\']\n')
+        config_file.write('config.Site.whitelist = [\'T2_TW_NCHC\']\n')
 
     config_file.close()
 
@@ -104,7 +104,7 @@ def main():
     parser.add_option('-l', '--lumi',        dest='lumiMask',    help='json with list of good lumis', default='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt')
     parser.add_option(      '--era',         dest='era',         help='era to use (sub-dir in data/)', default='era2017',  type='string')
     parser.add_option('-w', '--workDir',     dest='workDir',     help='working directory',             default='grid',     type='string')
-    parser.add_option(      '--lfn',         dest='lfn',         help='base lfn to store outputs',     default='/store/group/phys_top/efe', type='string')
+    parser.add_option(      '--lfn',         dest='lfn',         help='base lfn to store outputs',     default='/store/user/tihsu', type='string')
     parser.add_option('-s', '--submit',      dest='submit',      help='submit jobs',                   default=False,   action='store_true')
     (opt, args) = parser.parse_args()
 

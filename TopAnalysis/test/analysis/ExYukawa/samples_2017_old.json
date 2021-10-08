@@ -1,0 +1,7 @@
+{
+"MC13TeV_2017_TTGamma_Dilept"        : [0.6343, 0, "TTGamma_Dilept_TuneCP5_PSweights_13TeV_madgraph_pythia8", "ttgam_2l", 900, true, false, 1],
+"MC13TeV_2017_ttHToNonbb_M125"       : [0.5638, 0, "ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8", "TTH", 44, true, false, 1],
+"MC13TeV_2017_TTZToLLNuNu"           : [0.2432, 0, "TTZToLLNuNu_M-10_TuneCP5_PSweights_13TeV-amcatnlo-pythia8", "ttZ", 500, true, false, 1],
+"MC13TeV_2017_TTWJetsToLNu"          : [0.2198, 0, "TTWJetsToLNu_TuneCP5_PSweights_13TeV-amcatnloFXFX-madspin-pythia8", "ttW", 550, true, false, 1],
+"MC13TeV_2017_tZq_ll"                : [0.07358, 0, "tZq_ll_4f_ckm_NLO_TuneCP5_PSweights_13TeV-amcatnlo-pythia8", "tZq", 600, true, false, 1]
+}

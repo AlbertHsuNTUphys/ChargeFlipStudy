@@ -7,13 +7,14 @@ import numpy as np
 import math
 import argparse
 
+
 ##########
 # Parser #
 ##########
 
 parser = argparse.ArgumentParser(description = "Charge Flip Rate")
 parser.add_argument('plotdir',type=str)
-parser.add_argument('Covariance',type=bool)
+parser.add_argument('Covariance',type=int)
 args = parser.parse_args()
 
 #################
@@ -21,8 +22,7 @@ args = parser.parse_args()
 #################
 
 plotdir = args.plotdir # Change to your own directory
-Covariance = args.Covariance   # Consider the covariance of the uncertainty of Pij or not.
-
+Covariance =  (args.Covariance==1)   # Consider the covariance of the uncertainty of Pij or not.
 # Root file directory
 workdir = os.getcwd()
 targetdir = os.path.join(workdir+"/analysis_2017/Chunks/")
@@ -35,7 +35,7 @@ jsonfile.close()
 
 # Basic Set Up
 pt_region = np.array(( 20.0, 50.0, 100.0, 200., 300.)) # It will actually include overflow events ( Already in the root file )
-eta_region = np.array((0.0, 0.8, 1.5, 2.4))
+eta_region = np.array((0.0, 0.8, 1.479, 2.4))
 pt_bins = len(pt_region)-1
 eta_bins = len(eta_region)-1
 channel = ['MC_oc','MC_ss','data_oc','data_ss']
@@ -53,7 +53,7 @@ for s ,desc in samplesList:
   weight = desc[0]*41.5*1000
   for ff in Allfile:
     if s in ff:
-#      print(ff)
+      print(ff)
       try:
         inf = ROOT.TFile.Open(os.path.join(targetdir+ff))
         t = inf.Get("TreeInput")

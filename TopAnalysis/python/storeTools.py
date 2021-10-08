@@ -36,7 +36,7 @@ def getEOSlslist(directory, mask='', prepend='root://eoscms//eos/cms/'):
     ## return 
     return full_list
 
-def getChunksInSizeOf(chunkSize,directoryList,mask='',prepend='root://eoscms//eos/cms/'):
+def getChunksInSizeOf(chunkSize,directoryList,mask='',prepend='root://se01.grid.nchc.org.tw//'):
     
     """groups files in directory in chunks of a given size"""
 
@@ -44,7 +44,7 @@ def getChunksInSizeOf(chunkSize,directoryList,mask='',prepend='root://eoscms//eo
     cursize=0.
     for directory in directoryList:
 
-        fList=getEOSlslist(directory=directory, mask=mask, prepend='/eos/cms')
+        fList=getEOSlslist(directory=directory, mask=mask, prepend='')
 
         for f in fList:
             if not '.root' in f : continue
@@ -54,6 +54,6 @@ def getChunksInSizeOf(chunkSize,directoryList,mask='',prepend='root://eoscms//eo
                 cursize=fsize
             else:
                 cursize += fsize
-            chunkList[-1].append(f.replace('/eos/cms/',prepend))
+            chunkList[-1].append(f.replace('',prepend))
 
     return chunkList
